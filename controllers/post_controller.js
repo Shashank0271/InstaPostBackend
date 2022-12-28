@@ -1,10 +1,16 @@
 const { StatusCodes } = require('http-status-codes');
+const Blogpost =  require('../models/Posts');
 
 const getAllPosts = async (req, res) => {
-    res.status(StatusCodes.OK).json({ "message": "fetched all posts" });
+    result = await Blogpost.find();
+    res.status(StatusCodes.OK).json({ "message": "fetched all posts" , result});
 };
 
 const getMyPosts = async (req, res) => {
+    //queries are passed after : ? use req.query
+    //params are passed after '/' use req.params
+    console.log(req.query) ;
+    console.log(req.params) ;
     res.status(StatusCodes.OK).json({ "message": "fetched my posts" });
 }
 
