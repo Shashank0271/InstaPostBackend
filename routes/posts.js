@@ -9,7 +9,7 @@ const {
 } = require('../controllers/post_controller');
 
 const router = express.Router();
-router.route('/').get(getAllPosts);
-router.route('/:id').post(createPost).get(getMyPosts).delete(deletePost).patch(updatePost);
+router.route('/').get(getAllPosts).post(createPost);
+router.route('/:id').get(getMyPosts).delete(deletePost).patch(updatePost);
 
-module.exports = router ;
+module.exports = router;

@@ -1,32 +1,36 @@
-const mongoose = require('mongoose') ;
+const mongoose = require('mongoose');
 
 const postSchema = mongoose.Schema({
     title: {
-        type : String ,
-        trim : true ,
-        require : [true , 'a post title needs to be provided']
+        type: String,
+        trim: true,
+        require: [true, 'a post title needs to be provided']
     },
-    body : {
-        type : String,
-        trim : true ,
-        require : [true , 'a post title needs to be provided']
+    body: {
+        type: String,
+        trim: true,
+        require: [true, 'a post title needs to be provided']
     },
-    category : {
-        type : String,
-        require : [true , 'a category needs to be provided']
+    category: {
+        type: String,
+        require: [true, 'a category needs to be provided']
     },
-    likes : {
-        type : Number,
-        default : 0,
+    likes: {
+        type: Number,
+        default: 0,
     },
-    tags : {
-        type : [String],
-        default : [],
+    tags: {
+        type: [String],
+        default: [],
     },
-    date : {
-        type : Date,
-        default : Date.now,
+    date: {
+        type: Date,
+        default: Date.now,
+    },
+    userFirebaseId: {
+        type: String,
+        require: [true, 'user fid needs to be provided'],
     }
 });
 //the name that is passed as string should be equal to the name of collection 
-module.exports = mongoose.model('posts' , postSchema);
+module.exports = mongoose.model('posts', postSchema);
