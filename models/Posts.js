@@ -4,32 +4,31 @@ const postSchema = mongoose.Schema({
     title: {
         type: String,
         trim: true,
-        require: [true, 'a post title needs to be provided']
+        required: [true, 'a post title needs to be provided']
     },
     body: {
         type: String,
         trim: true,
-        require: [true, 'a post title needs to be provided']
-    },
-    category: {
-        type: String,
-        require: [true, 'a category needs to be provided']
+        required: [true, 'a post title needs to be provided']
     },
     likes: {
         type: Number,
         default: 0,
     },
-    tags: {
-        type: [String],
-        default: [],
+    category: {
+        type: String,
+        required: [true, 'a post category needs to be provided'],
     },
-    date: {
+    createdOn: {
         type: Date,
         default: Date.now,
     },
     userFirebaseId: {
         type: String,
-        require: [true, 'user fid needs to be provided'],
+        required: [true, 'user fid needs to be provided']
+    },
+    imageUrl: {
+        type: String,
     }
 });
 //the name that is passed as string should be equal to the name of collection 
