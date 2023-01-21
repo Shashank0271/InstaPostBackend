@@ -71,7 +71,7 @@ const updatePost = async (req, res) => {
     else {
         post.imageUrl = post["imageUrl"];
     }
-    const updatedPost = await Blogpost.findByIdAndUpdate(
+    await Blogpost.findByIdAndUpdate(
         postId,
         {
             title: post.title,
