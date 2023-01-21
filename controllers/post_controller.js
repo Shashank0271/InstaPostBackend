@@ -45,7 +45,7 @@ const deletePost = async (req, res) => {
 const updatePost = async (req, res) => {
     let { title, body } = req.body;
     const { id: postId } = req.params;
-    const file = req.file;
+    const file = req.files.photo;
     post = await Blogpost.findById(postId);
     if (!post) {
         throw new CustomAPIError('Post with id does not exist', StatusCodes.NOT_FOUND);
@@ -79,7 +79,12 @@ const updatePost = async (req, res) => {
             imageUrl: post.imageUrl,
         }
     );
-    res.status(StatusCodes.OK).json({ "message": "updated post" });
+    res.status(StatusCodes.OK).json({
+        message: "updated post",
+        title: post.title,
+        body: post.body,
+        imageUrl: post.imageUrl,
+    });
 }
 
 module.exports = {
