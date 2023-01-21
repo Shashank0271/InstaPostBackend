@@ -1,10 +1,9 @@
 const { request, response } = require('express');
 const { StatusCodes } = require('http-status-codes');
 const { CustomAPIError } = require('../errors/custom-error');
-const cloudinary = require('cloudinary').v2;
-const { options, deleteImage } = require('../image_upload/connect');
+const { deleteImage } = require('../modules/cloudinaryApis/deleteFile');
+const { uploadImage } = require('../modules/cloudinaryApis/createImage');
 const Blogpost = require('../models/Posts');
-
 
 
 const getAllPosts = async (req, res) => {
@@ -24,21 +23,20 @@ const createPost = async (req, res) => {
     console.log("entered create post controller");
     const file = req.files.photo;
     //upload post pic :
-    const response = await cloudinary.uploader.upload(file.tempFilePath, options);
-    const imageUrl = response.url;
+    const imageUrl = await uploadImage(file);
     //creating post doc :
-    req.body.imageUrl = imageUrl; 
+    req.body.imageUrl = imageUrl;
+    console.log(req.body);
     try {
         post = await Blogpost.create(req.body);
         res.status(StatusCodes.CREATED).json({ "message": "created my posts", post });
     }
     catch (error) {
-        deleteImage(imageUrl);
+        await deleteImage(imageUrl);
         throw error;
     }
 }
 
-//add cloudinary
 const deletePost = async (req, res) => {
     console.log("entered delete posts controller");
     result = await Blogpost.findByIdAndDelete(req.params.id);

@@ -16,14 +16,7 @@ module.exports.options = {
     overwrite: true,
 };
 
-module.exports.deleteImage = async (imageUrl) => {
-    const urlArray = imageUrl.split('/');
-    const image = urlArray[urlArray.length - 1];
-    const imageName = image.split('.')[0];
-    await cloudinary.uploader.destroy(imageName).then(() => {
-        console.log("image deleted");
-    });
-}
+
 
 
 

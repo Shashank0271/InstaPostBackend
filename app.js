@@ -1,7 +1,7 @@
 require('express-async-errors');
 require('dotenv').config();
 const fileUpload = require('express-fileupload');
-const { setupCloudConfig } = require('./image_upload/connect');
+const { setupCloudConfig } = require('./modules/cloudinaryApis/connect');
 const express = require('express');
 const app = express();
 const connectDB = require('./db/connect');
