@@ -7,6 +7,7 @@ const app = express();
 const connectDB = require('./db/connect');
 const errorHandlerMiddleware = require('./middleware/error-handler');
 const posts = require('./routes/posts');
+const users = require('./routes/users');
 
 //port
 const port = process.env.PORT || 4000;
@@ -16,8 +17,9 @@ app.use(fileUpload({
     useTempFiles: true
 }));
 app.use(express.json());
-app.use('/api/v1/posts', posts);
-app.use(errorHandlerMiddleware);
+app.use('/api/v1/posts', posts) ;
+app.use('/api/v1/users', users) ;
+app.use(errorHandlerMiddleware) ;
 
 
 //cloudinary
