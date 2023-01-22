@@ -17,7 +17,21 @@ const getUser = async (req, res) => {
     res.status(StatusCodes.OK).json(user);
 }
 
+const updateUser = async (req, res) => {
+    console.log("entered update user controller");
+    const { firebaseUid, userName } = req.body;
+    const user = await User.find({ firebaseUid: firebaseUid });
+    if (userName != undefined) {
+        user.username = userName;
+    }
+    await User.updateOne({ firebaseUid: firebaseUid }, {
+        username: user.username,
+    });
+    res.status(StatusCodes.OK).json({ message: "profile updated successfully" });
+}
+
 module.exports = {
     createUser,
     getUser,
+    updateUser,
 }

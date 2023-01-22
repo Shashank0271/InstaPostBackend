@@ -30,6 +30,9 @@ const createPost = async (req, res) => {
         await deleteImage(imageUrl);
         throw error;
     }
+
+    
+
 }
 
 const deletePost = async (req, res) => {
