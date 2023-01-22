@@ -7,7 +7,13 @@ const User = mongoose.Schema({
     },
     email: {
         type: String,
+        // unique: true, //commented out for testing
         required: [true, 'an email must be provided']
+    },
+    firebaseUid: {
+        type: String,
+        // unique: true, //commented out for testing
+        required: [true, 'firebase UID must be provided']
     },
     registrationToken: {
         type: String,
