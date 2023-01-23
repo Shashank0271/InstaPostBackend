@@ -31,8 +31,6 @@ const createPost = async (req, res) => {
         throw error;
     }
 
-    
-
 }
 
 const deletePost = async (req, res) => {
@@ -56,23 +54,14 @@ const updatePost = async (req, res) => {
     if (title != undefined) {//update title
         post.title = title;
     }
-    else {//if title is not provided by the user
-        title = post["title"];
-    }
     if (body != undefined) {//update body
         post.body = body;
-    }
-    else {//if body is not provided by the user
-        body = post["body"];
     }
     if (file != undefined) {//update blog image
         const imageUrl = post.imageUrl;
         await deleteImage(imageUrl);
         const newImageUrl = await uploadImage(file);
         post.imageUrl = newImageUrl;
-    }
-    else {
-        post.imageUrl = post["imageUrl"];
     }
     await Blogpost.findByIdAndUpdate(
         postId,
