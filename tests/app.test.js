@@ -1,18 +1,18 @@
-require('../db/connect');
 const request = require('supertest');
 const { MongoMemoryServer } = require('mongodb-memory-server');
-const app = require('../app');
+const startServer = require('../app');
 const User = require('../models/User');
-const { default: mongoose } = require('mongoose');
+const { disconnectDB } = require('../db/connect');
 
 describe("user apis", () => {
-    beforeAll(async () => {
-        const mongoserver = await MongoMemoryServer.create();
-        await mongoose.connect(mongoserver.getUri());
-    })
+    let app;
+    beforeEach(async () => {
+        const mongoTestServer = await MongoMemoryServer.create();
+        app = startServer(mongoTestServer.getUri());
+    });
     afterAll(async () => {
-
-    })  
+        await disconnectDB().then(() => console.log("disconnected"));
+    });
     describe("USER POST/---- ", () => {
         //should save the user into the database 
         //should response with a json object containing the user
