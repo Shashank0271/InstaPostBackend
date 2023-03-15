@@ -2,8 +2,14 @@ const request = require("supertest");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const startServer = require("../app");
 const { disconnectDB } = require("../db/connect");
-// import * as errorHandler from "../middleware/error-handler";
-const errorHandler = require("../middleware/error-handler");
+const userServices = require("../controllers/user_controller");
+
+const userObject = {
+  username: "testusername",
+  email: "testemail@gmail.com",
+  firebaseUid: "firebasetestuid",
+  registrationToken: "fakeregtoken",
+};
 
 describe("user apis", () => {
   let app;
@@ -14,14 +20,12 @@ describe("user apis", () => {
   afterAll(async () => {
     await disconnectDB();
   });
+  
   describe("USER POST/---- ", () => {
     it("on giving details ,should responde with a 200 status code", async () => {
-      const response = await request(app).post("/api/v1/users").send({
-        username: "testusername",
-        email: "testemail@gmail.com",
-        firebaseUid: "firebasetestuid",
-        registrationToken: "fakeregtoken",
-      });
+      const response = await request(app)
+        .post("/api/v1/users")
+        .send(userObject);
       expect(response.statusCode).toBe(200);
       expect(response.body).not.toBeNull;
     });
@@ -37,12 +41,7 @@ describe("user apis", () => {
       expect(body.msg).toBe("user validation failed");
     });
     it("should not insert duplicate emails", async () => {
-      await request(app).post("/api/v1/users").send({
-        username: "testusername",
-        email: "testemail@gmail.com",
-        firebaseUid: "firebasetestuid",
-        registrationToken: "fakeregtoken",
-      });
+      await request(app).post("/api/v1/users").send(userObject);
       const { statusCode, body } = await request(app)
         .post("/api/v1/users")
         .send({

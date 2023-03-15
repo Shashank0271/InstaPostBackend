@@ -29,7 +29,7 @@ const postSchema = mongoose.Schema({
     },
     userName: {
         type: String,
-        require: [true, 'users name must be provided']
+        required: [true, 'users name must be provided']
     },
     imageUrl: {
         type: String,
