@@ -14,7 +14,8 @@ const getUser = async (req, res) => {
   console.log("entered get user controller");
   const firebaseUid = req.params.id;
   const user = await User.findOne({ firebaseUid: firebaseUid });
-  if (user.length == 0)
+  console.log(user);
+  if (!user)
     throw new CustomAPIError("user does not exist", StatusCodes.NOT_FOUND);
   console.log(user);
   res.status(StatusCodes.OK).json(user);
