@@ -2,6 +2,7 @@ const request = require("supertest");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const startServer = require("../app");
 const { disconnectDB } = require("../db/connect");
+const User = require("../models/User");
 
 const userObject = {
   username: "testusername",
@@ -12,10 +13,12 @@ const userObject = {
 
 describe("USER APIS", () => {
   let app;
+
   beforeAll(async () => {
     const mongoTestServer = await MongoMemoryServer.create();
     app = startServer(mongoTestServer.getUri());
   });
+
   afterAll(async () => {
     await disconnectDB();
   });
@@ -67,11 +70,9 @@ describe("USER APIS", () => {
   });
 
   describe("USER get", () => {
-    const firebaseUid = "firebasetestuid";
-
     it("should return the user given a valid firebaseUID", async () => {
       const { statusCode, body } = await request(app).get(
-        `/api/v1/users/${firebaseUid}`
+        `/api/v1/users/${userObject.firebaseUid}`
       );
       expect(statusCode).toBe(200);
       expect(body.username).toBe(userObject.username);
@@ -89,13 +90,29 @@ describe("USER APIS", () => {
         `/api/v1/users/randomFI`
       );
       expect(statusCode).toBe(404);
-      console.log(body);
       expect(body.msg).toBe("user does not exist");
     });
   });
 
   //TODO : add tests for USER update
-  describe("USER update", () => {});
+  describe("USER update", () => {
+    it("should return with 200 status code", async () => {
+      const { statusCode, body } = await request(app)
+        .patch("/api/v1/users")
+        .send({
+          firebaseUid: userObject.firebaseUid,
+          username: "uname",
+        });
+
+      expect(statusCode).toBe(200);
+      expect(body.message).toBe("profile updated successfully");
+
+      const updatedUser = await User.findOne({
+        firebaseUid: userObject.firebaseUid,
+      });
+      expect(updatedUser.username).toBe("uname");
+    });
+  });
 
   //TODO : add tests for follow user
   describe("USER follow", () => {});

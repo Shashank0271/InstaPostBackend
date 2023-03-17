@@ -23,10 +23,10 @@ const getUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   console.log("entered update user controller");
-  const { firebaseUid, userName } = req.body;
+  const { firebaseUid, username } = req.body;
   const user = await User.find({ firebaseUid: firebaseUid });
-  if (userName != undefined) {
-    user.username = userName;
+  if (username != undefined) {
+    user.username = username;
   }
   await User.updateOne(
     { firebaseUid: firebaseUid },
