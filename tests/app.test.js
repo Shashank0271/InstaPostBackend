@@ -3,6 +3,7 @@ const { MongoMemoryServer } = require("mongodb-memory-server");
 const startServer = require("../app");
 const { disconnectDB } = require("../db/connect");
 const User = require("../models/User");
+const { StatusCodes } = require("http-status-codes");
 
 const userObject = {
   username: "testusername",
@@ -28,6 +29,7 @@ describe("USER APIS", () => {
       const response = await request(app)
         .post("/api/v1/users")
         .send(userObject);
+
       expect(response.statusCode).toBe(200);
       expect(response.body).not.toBeNull;
       expect(response.body.newUser.username).toBe(userObject.username);
@@ -50,12 +52,12 @@ describe("USER APIS", () => {
           email: "testemailgail.com",
           registrationToken: "fakeregtoken",
         });
+
       expect(statusCode).not.toBe(200);
       expect(body.msg).toBe("user validation failed");
     });
 
     it("should not insert duplicate emails", async () => {
-      await request(app).post("/api/v1/users").send(userObject);
       const { statusCode, body } = await request(app)
         .post("/api/v1/users")
         .send({
@@ -64,6 +66,7 @@ describe("USER APIS", () => {
           firebaseUid: "firebasetestuid2",
           registrationToken: "fakeregtoken2",
         });
+
       expect(statusCode).toBe(500);
       expect(body.msg).toBe("Something went wrong, please try again");
     });
@@ -74,7 +77,9 @@ describe("USER APIS", () => {
       const { statusCode, body } = await request(app).get(
         `/api/v1/users/${userObject.firebaseUid}`
       );
+
       expect(statusCode).toBe(200);
+      expect(body).not.toBeNull;
       expect(body.username).toBe(userObject.username);
       expect(body.email).toBe(userObject.email);
       expect(body.firebaseUid).toBe(userObject.firebaseUid);
@@ -94,7 +99,6 @@ describe("USER APIS", () => {
     });
   });
 
-  //TODO : add tests for USER update
   describe("USER update", () => {
     it("should return with 200 status code", async () => {
       const { statusCode, body } = await request(app)
@@ -112,8 +116,79 @@ describe("USER APIS", () => {
       });
       expect(updatedUser.username).toBe("uname");
     });
+
+    it("should not modify username if its an empty string", async () => {
+      const { statusCode, body } = await request(app)
+        .patch("/api/v1/users")
+        .send({
+          firebaseUid: userObject.firebaseUid,
+          username: "",
+        });
+      expect(statusCode).toBe(StatusCodes.BAD_REQUEST);
+      expect(body.message).toBe("username needs to be provided");
+    });
   });
 
   //TODO : add tests for follow user
-  describe("USER follow", () => {});
+  describe("USER follow", () => {
+    it("should update the follower and following parameters when a user follows another", async () => {
+      //create a new user in the database
+      const createUserResponse = await request(app).post("/api/v1/users").send({
+        username: "newUser",
+        email: "newuser@gmail.com",
+        firebaseUid: "newuserfid",
+        registrationToken: "fakeregtoken2",
+      });
+      const { newUser } = createUserResponse.body;
+
+      //make the current userObject follow the new user
+      const { statusCode, body } = await request(app)
+        .post("/api/v1/users/follow")
+        .send({
+          currentUserFid: userObject.firebaseUid,
+          followedUserFid: newUser.firebaseUid,
+        });
+
+      expect(statusCode).toBe(StatusCodes.OK);
+      expect(body.message).toBe("user followed successfully");
+
+      currentUser = await User.findOne({
+        firebaseUid: userObject.firebaseUid,
+      });
+      followedUser = await User.findOne({
+        firebaseUid: newUser.firebaseUid,
+      });
+      expect(currentUser).not.toBeNull;
+      expect(followedUser).not.toBeNull;
+    });
+    let currentUser, followedUser;
+    it("the current users following list should be updated with an increase of 1 in length", () => {
+      expect(currentUser.following.length).toBe(1);
+    });
+
+    it("the last item in the list should be the firebaseuid of the new user", () => {
+      expect(currentUser.following[currentUser.following.length - 1]).toBe(
+        followedUser.firebaseUid
+      );
+    });
+
+    it("the new users follers list should be updated with an increase of 1 in length", () => {});
+    it("the last item in the list should be the firebaseuid of the current user", () => {});
+  });
 });
+
+/*{
+    "message": "user created successfully",
+    "newUser": {
+        "username": "Shashangggk",
+        "email": "ssingh02cgc71@gmail.com",
+        "firebaseUid": "firebasgggeUid",
+        "registrationToken": "dummgy reg token",
+        "postIds": [],
+        "followersTokens": [],
+        "followers": [],
+        "following": [],
+        "_id": "64158d50cb3f2b2263cd5db0",
+        "__v": 0
+    }
+}*/

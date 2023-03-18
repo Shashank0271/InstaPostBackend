@@ -14,16 +14,19 @@ const getUser = async (req, res) => {
   console.log("entered get user controller");
   const firebaseUid = req.params.id;
   const user = await User.findOne({ firebaseUid: firebaseUid });
-  console.log(user);
   if (!user)
     throw new CustomAPIError("user does not exist", StatusCodes.NOT_FOUND);
-  console.log(user);
   res.status(StatusCodes.OK).json(user);
 };
 
 const updateUser = async (req, res) => {
   console.log("entered update user controller");
   const { firebaseUid, username } = req.body;
+  if (username.trim().length === 0 || username == null) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ message: "username needs to be provided" });
+  }
   const user = await User.find({ firebaseUid: firebaseUid });
   if (username != undefined) {
     user.username = username;
@@ -40,6 +43,8 @@ const followUser = async (req, res) => {
   const { currentUserFid, followedUserFid } = req.body;
   const currentUser = await User.findOne({ firebaseUid: currentUserFid });
   const followedUser = await User.findOne({ firebaseUid: followedUserFid });
+  console.log(currentUser);
+  console.log(followedUser);
   currentUser.following.push(followedUserFid);
   followedUser.followers.push(currentUserFid);
   await User.updateOne(
