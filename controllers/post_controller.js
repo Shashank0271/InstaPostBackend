@@ -56,10 +56,26 @@ const deletePost = async (req, res) => {
   res.status(StatusCodes.NO_CONTENT).json();
 };
 
-const updatePost = async (req, res) => {
-  let { title, body } = req.body;
+const likePost = async (req, res) => {
+  console.log("entered like PostController");
   const { id: postId } = req.params;
-  const file = req.files.photo;
+  const requiredPost = await Blogpost.findById(postId);
+  await Blogpost.findByIdAndUpdate(postId, { likes: requiredPost.likes + 1 });
+};
+
+const unlikePost = async (req, res) => {
+  console.log("entered unlike post controller");
+  const { id: postId } = req.params;
+  const requiredPost = await Blogpost.findById(postId);
+  await Blogpost.findByIdAndUpdate(postId, { likes: requiredPost.likes - 1 });
+};
+
+const updatePost = async (req, res) => {
+  console.log("entered update post controller");
+  let { title, body, category } = req.body;
+  const { id: postId } = req.params;
+  const file = req.files != null ? req.files.photo : null;
+  console.log(file != null);
   post = await Blogpost.findById(postId);
   if (!post) {
     throw new CustomAPIError(
@@ -73,6 +89,10 @@ const updatePost = async (req, res) => {
   if (body != undefined) {
     post.body = body;
   }
+  if (category != undefined) {
+    console.log("eNtered !");
+    post.category = category;
+  }
   if (file != undefined) {
     const imageUrl = post.imageUrl;
     await deleteImage(imageUrl);
@@ -83,6 +103,7 @@ const updatePost = async (req, res) => {
     title: post.title,
     body: post.body,
     imageUrl: post.imageUrl,
+    category: post.category,
   });
   res.status(StatusCodes.OK).json({
     message: "updated post",
@@ -99,4 +120,6 @@ module.exports = {
   createPost,
   deletePost,
   updatePost,
+  likePost,
+  unlikePost,
 };
