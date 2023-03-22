@@ -10,15 +10,12 @@ const createPost = async (req, res) => {
   const file = req.files.photo;
   const imageUrl = await uploadImage(file);
   req.body.imageUrl = imageUrl;
-  // console.log(req.body);
   try {
     post = await Blogpost.create(req.body);
-    currentUser = await User.findOne({ userFirebaseId: req.userFirebaseId });
-    console.log(post);
-    console.log(currentUser);
+    currentUser = await User.findOne({ firebaseUid: req.body.userFirebaseId });
     const currentPostCount = currentUser.postCount;
     await User.updateOne(
-      { userFirebaseId: req.userFirebaseId },
+      { firebaseUid: req.body.userFirebaseId },
       { postCount: currentPostCount + 1 }
     );
     res.status(StatusCodes.CREATED).json(post);
