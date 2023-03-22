@@ -161,7 +161,9 @@ describe("USER APIS", () => {
       expect(currentUser).not.toBeNull;
       expect(followedUser).not.toBeNull;
     });
+
     let currentUser, followedUser;
+
     it("the current users following list should be updated with an increase of 1 in length", () => {
       expect(currentUser.following.length).toBe(1);
     });

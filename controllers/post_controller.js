@@ -3,6 +3,30 @@ const { CustomAPIError } = require("../errors/custom-error");
 const { deleteImage } = require("../modules/cloudinaryApis/deleteFile");
 const { uploadImage } = require("../modules/cloudinaryApis/createImage");
 const Blogpost = require("../models/Posts");
+const User = require("../models/User");
+
+const createPost = async (req, res) => {
+  console.log("entered create post controller");
+  const file = req.files.photo;
+  const imageUrl = await uploadImage(file);
+  req.body.imageUrl = imageUrl;
+  // console.log(req.body);
+  try {
+    post = await Blogpost.create(req.body);
+    currentUser = await User.findOne({ userFirebaseId: req.userFirebaseId });
+    console.log(post);
+    console.log(currentUser);
+    const currentPostCount = currentUser.postCount;
+    await User.updateOne(
+      { userFirebaseId: req.userFirebaseId },
+      { postCount: currentPostCount + 1 }
+    );
+    res.status(StatusCodes.CREATED).json(post);
+  } catch (error) {
+    await deleteImage(imageUrl);
+    throw error;
+  }
+};
 
 const getAllPosts = async (_, res) => {
   result = await Blogpost.find();
@@ -15,19 +39,11 @@ const getMyPosts = async (req, res) => {
   res.status(StatusCodes.OK).json(posts);
 };
 
-const createPost = async (req, res) => {
-  console.log("entered create post controller");
-  const file = req.files.photo;
-  const imageUrl = await uploadImage(file);
-  req.body.imageUrl = imageUrl;
-  console.log(req.body);
-  try {
-    post = await Blogpost.create(req.body);
-    res.status(StatusCodes.CREATED).json(post);
-  } catch (error) {
-    await deleteImage(imageUrl);
-    throw error;
-  }
+const getPost = async (req, res) => {
+  console.log("fetching single post");
+  const { id: postId } = req.params;
+  const post = await Blogpost.findById(postId);
+  res.status(StatusCodes.OK).json(post);
 };
 
 const deletePost = async (req, res) => {
@@ -55,15 +71,12 @@ const updatePost = async (req, res) => {
     );
   }
   if (title != undefined) {
-    //update title
     post.title = title;
   }
   if (body != undefined) {
-    //update body
     post.body = body;
   }
   if (file != undefined) {
-    //update blog image
     const imageUrl = post.imageUrl;
     await deleteImage(imageUrl);
     const newImageUrl = await uploadImage(file);
@@ -85,6 +98,7 @@ const updatePost = async (req, res) => {
 module.exports = {
   getAllPosts,
   getMyPosts,
+  getPost,
   createPost,
   deletePost,
   updatePost,

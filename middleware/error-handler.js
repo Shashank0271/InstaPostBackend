@@ -6,6 +6,7 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     return res.status(err.statusCode).json({ msg: err.message });
   }
   if (err.name == "ValidationError") {
+    console.log(err);
     return res
       .status(StatusCodes.PRECONDITION_FAILED)
       .json({ msg: err["_message"] });

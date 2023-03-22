@@ -43,8 +43,6 @@ const followUser = async (req, res) => {
   const { currentUserFid, followedUserFid } = req.body;
   const currentUser = await User.findOne({ firebaseUid: currentUserFid });
   const followedUser = await User.findOne({ firebaseUid: followedUserFid });
-  console.log(currentUser);
-  console.log(followedUser);
   currentUser.following.push(followedUserFid);
   followedUser.followers.push(currentUserFid);
   await User.updateOne(

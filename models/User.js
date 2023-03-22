@@ -21,11 +21,11 @@ const User = mongoose.Schema({
   },
   registrationToken: {
     type: String,
-    // required: [true, 'fcm registration token must be provided']
+    required: [true, "fcm registration token must be provided"],
   },
-  postIds: {
-    type: [String],
-    default: [],
+  postCount: {
+    type: Number,
+    default: 0,
   },
   followersTokens: {
     type: [String],
