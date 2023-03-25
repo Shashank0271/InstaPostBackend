@@ -40,18 +40,23 @@ const updateUser = async (req, res) => {
 
 const followUser = async (req, res) => {
   console.log("enter follow user controller");
-  const { currentUserFid, followedUserFid } = req.body;
+  const { currentUserFid, followedUserFid, currentUserToken } = req.body;
+  console.log(currentUserToken);
   const currentUser = await User.findOne({ firebaseUid: currentUserFid });
   const followedUser = await User.findOne({ firebaseUid: followedUserFid });
   currentUser.following.push(followedUserFid);
   followedUser.followers.push(currentUserFid);
+  followedUser.followersTokens.push(currentUserToken);
   await User.updateOne(
     { firebaseUid: currentUserFid },
     { following: currentUser.following }
   );
   await User.updateOne(
     { firebaseUid: followedUserFid },
-    { followers: followedUser.followers }
+    {
+      followers: followedUser.followers,
+      followersTokens: followedUser.followersTokens,
+    }
   );
   return res
     .status(StatusCodes.OK)

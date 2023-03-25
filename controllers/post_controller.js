@@ -4,6 +4,7 @@ const { deleteImage } = require("../modules/cloudinaryApis/deleteFile");
 const { uploadImage } = require("../modules/cloudinaryApis/createImage");
 const Blogpost = require("../models/Posts");
 const User = require("../models/User");
+const { admin } = require("../modules/fcm/fcm");
 
 const createPost = async (req, res) => {
   console.log("entered create post controller");
@@ -18,6 +19,30 @@ const createPost = async (req, res) => {
       { firebaseUid: req.body.userFirebaseId },
       { postCount: currentPostCount + 1 }
     );
+    console.log(currentUser.followersTokens);
+    if (currentUser.followersTokens.length > 0)
+      await admin
+        .messaging()
+        .sendMulticast({
+          notification: {
+            title: currentUser.username,
+            body: post.title,
+          },
+          data: {
+            postId: post["_id"].toString(),
+          },
+          tokens: currentUser.followersTokens,
+          android: {
+            notification: {
+              channel_id: "pushnotificationapp",
+            },
+          },
+        })
+        .then((response) => {
+          console.log(response.failureCount);
+          console.log(response.successCount);
+          console.log("messages sent!");
+        });
     res.status(StatusCodes.CREATED).json(post);
   } catch (error) {
     await deleteImage(imageUrl);

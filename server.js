@@ -1,2 +1,3 @@
-const startServer = require('./app');
-startServer(process.env.MONGO_URI);
+const server = require('./app');
+// console.log(server);
+server.startServerWithUrl(process.env.MONGO_URI);
