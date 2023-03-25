@@ -10,6 +10,7 @@ const createPost = async (req, res) => {
   console.log("entered create post controller");
   const file = req.files.photo;
   const imageUrl = await uploadImage(file);
+  console.log(imageUrl);
   req.body.imageUrl = imageUrl;
   try {
     post = await Blogpost.create(req.body);
@@ -19,7 +20,6 @@ const createPost = async (req, res) => {
       { firebaseUid: req.body.userFirebaseId },
       { postCount: currentPostCount + 1 }
     );
-    console.log(currentUser.followersTokens);
     if (currentUser.followersTokens.length > 0)
       await admin
         .messaging()

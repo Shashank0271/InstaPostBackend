@@ -1,6 +1,6 @@
 const request = require("supertest");
 const { MongoMemoryServer } = require("mongodb-memory-server");
-const startServer = require("../app");
+const {startServerWithUrl} = require("../app");
 const { disconnectDB } = require("../db/connect");
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
@@ -17,7 +17,7 @@ describe("USER APIS", () => {
 
   beforeAll(async () => {
     const mongoTestServer = await MongoMemoryServer.create();
-    app = startServer(mongoTestServer.getUri());
+    app = startServerWithUrl(mongoTestServer.getUri());
   });
 
   afterAll(async () => {
