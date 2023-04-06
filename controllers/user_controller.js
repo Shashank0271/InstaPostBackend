@@ -1,6 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const { CustomAPIError } = require("../errors/custom-error");
 const User = require("../models/User");
+const redisClient = require("../redis/connect");
 
 const createUser = async (req, res) => {
   console.log("entered create user controller");
@@ -13,28 +14,38 @@ const createUser = async (req, res) => {
 const getUser = async (req, res) => {
   console.log("entered get user controller");
   const firebaseUid = req.params.id;
-  const user = await User.findOne({ firebaseUid: firebaseUid });
-  if (!user)
-    throw new CustomAPIError("user does not exist", StatusCodes.NOT_FOUND);
-  res.status(StatusCodes.OK).json(user);
+
+  const cachedUser = await redisClient.get(firebaseUid);
+
+  if (cachedUser) {
+    console.log("user  present in cache !");
+    res.status(200).json(JSON.parse(cachedUser));
+  } else {
+    console.log("cache miss");
+    const user = await User.findOne({ firebaseUid: firebaseUid });
+    if (!user)
+      throw new CustomAPIError("user does not exist", StatusCodes.NOT_FOUND);
+
+    redisClient.set(firebaseUid, JSON.stringify(user));
+
+    res.status(StatusCodes.OK).json(user);
+  }
 };
 
 const updateUser = async (req, res) => {
   console.log("entered update user controller");
   const { firebaseUid, username } = req.body;
-  if (username.trim().length === 0 || username == null) {
+  if (!username) {
     return res
       .status(StatusCodes.BAD_REQUEST)
       .json({ message: "username needs to be provided" });
   }
-  const user = await User.find({ firebaseUid: firebaseUid });
-  if (username != undefined) {
-    user.username = username;
-  }
-  await User.updateOne(
+  
+  const updatedUser = await User.findOneAndUpdate(
     { firebaseUid: firebaseUid },
-    { username: user.username }
+    { username: username }
   );
+  redisClient.set(firebaseUid, JSON.stringify(updatedUser));
   res.status(StatusCodes.OK).json({ message: "profile updated successfully" });
 };
 
@@ -47,17 +58,21 @@ const followUser = async (req, res) => {
   currentUser.following.push(followedUserFid);
   followedUser.followers.push(currentUserFid);
   followedUser.followersTokens.push(currentUserToken);
-  await User.updateOne(
+  const currentUserUpdated = await User.findOneAndUpdate(
     { firebaseUid: currentUserFid },
     { following: currentUser.following }
   );
-  await User.updateOne(
+  const followedUserUpdated = await User.findOneAndUpdate(
     { firebaseUid: followedUserFid },
     {
       followers: followedUser.followers,
       followersTokens: followedUser.followersTokens,
     }
   );
+
+  redisClient.set(currentUserFid, JSON.stringify(currentUserUpdated));
+  redisClient.set(followedUserFid, JSON.stringify(followedUserUpdated));
+
   return res
     .status(StatusCodes.OK)
     .json({ message: "user followed successfully" });

@@ -1,14 +1,25 @@
 require("express-async-errors");
 require("dotenv").config();
 require("./modules/fcm/fcm").initFcm();
+require("./redis/connect");
 const fileUpload = require("express-fileupload");
 const { setupCloudConfig } = require("./modules/cloudinaryApis/connect");
 const express = require("express");
 const app = express();
 const { connectDB } = require("./db/connect");
-const {errorHandlerMiddleware} = require("./middleware/error-handler");
+const { errorHandlerMiddleware } = require("./middleware/error-handler");
 const posts = require("./routes/posts");
 const users = require("./routes/users");
+
+/*
+TODO : FEATURES TO ADD : 
+1)implement redis to cache user profile
+2)secure apis using firebase user token (middleware)
+3)add comments section to the application
+(make sep collection for comments and use postid to identify comments for a certain post)
+4)create docker file for project
+5)try to deploy on kubernetes
+*/
 
 //port
 const port = process.env.PORT || 4000;
@@ -22,9 +33,7 @@ app.use(
 app.use(express.json());
 app.use("/api/v1/posts", posts);
 app.use("/api/v1/users", users);
-app.use(errorHandlerMiddleware);
-
-//cloudinary
+app.use(errorHandlerMiddleware); //cloudinary
 setupCloudConfig();
 
 module.exports.startServerWithUrl = (databaseUrl) => {

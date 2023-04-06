@@ -7,7 +7,7 @@ const User = mongoose.Schema({
   },
   email: {
     type: String,
-    unique: true, //commented out for testing
+    unique: true,
     match: [
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
       "Please fill a valid email address",
@@ -16,7 +16,7 @@ const User = mongoose.Schema({
   },
   firebaseUid: {
     type: String,
-    unique: true, //commented out for testing
+    unique: true,
     required: [true, "firebase UID must be provided"],
   },
   registrationToken: {
@@ -36,6 +36,10 @@ const User = mongoose.Schema({
     default: [],
   },
   following: {
+    type: [String],
+    default: [],
+  },
+  likedPosts: {
     type: [String],
     default: [],
   },

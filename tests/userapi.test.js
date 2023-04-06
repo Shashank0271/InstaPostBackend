@@ -179,18 +179,4 @@ describe("USER APIS", () => {
   });
 });
 
-/*{
-    "message": "user created successfully",
-    "newUser": {
-        "username": "Shashangggk",
-        "email": "ssingh02cgc71@gmail.com",
-        "firebaseUid": "firebasgggeUid",
-        "registrationToken": "dummgy reg token",
-        "postIds": [],
-        "followersTokens": [],
-        "followers": [],
-        "following": [],
-        "_id": "64158d50cb3f2b2263cd5db0",
-        "__v": 0
-    }
-}*/
+

@@ -45,6 +45,7 @@ const createPost = async (req, res) => {
         });
     res.status(StatusCodes.CREATED).json(post);
   } catch (error) {
+    console.error(error.toString());
     await deleteImage(imageUrl);
     throw error;
   }
