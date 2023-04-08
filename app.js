@@ -11,15 +11,20 @@ const { errorHandlerMiddleware } = require("./middleware/error-handler");
 const posts = require("./routes/posts");
 const users = require("./routes/users");
 
+const os = require("os");
+const cluster = require("cluster");
+
 /*
 TODO : FEATURES TO ADD : 
-1)implement redis to cache user profile
 2)secure apis using firebase user token (middleware)
-3)add comments section to the application
+6)add comments section to the application
 (make sep collection for comments and use postid to identify comments for a certain post)
 4)create docker file for project
 5)try to deploy on kubernetes
 */
+
+//CPUs
+const numCpus = os.cpus().length;
 
 //port
 const port = process.env.PORT || 4000;
@@ -34,6 +39,7 @@ app.use(express.json());
 app.use("/api/v1/posts", posts);
 app.use("/api/v1/users", users);
 app.use(errorHandlerMiddleware); //cloudinary
+
 setupCloudConfig();
 
 module.exports.startServerWithUrl = (databaseUrl) => {
@@ -41,12 +47,20 @@ module.exports.startServerWithUrl = (databaseUrl) => {
   const start = async () => {
     try {
       await connectDB(databaseUrl);
-      app.listen(
-        port,
-        console.log(`The server is listening on port ${port}...`)
-      );
+      if (cluster.isMaster) {
+        for (let i = 0; i < numCpus; i++) {
+          cluster.fork();
+        }
+      } else {
+        app.listen(
+          port,
+          console.log(
+            `The server PID=${process.pid} is listening on port ${port}...`
+          )
+        );
+      }
     } catch (error) {
-      console.log(error);
+      console.log(error.toString());
     }
   };
 

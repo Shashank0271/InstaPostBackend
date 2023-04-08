@@ -16,6 +16,8 @@ const createPost = async (req, res) => {
     post = await Blogpost.create(req.body);
     currentUser = await User.findOne({ firebaseUid: req.body.userFirebaseId });
     const currentPostCount = currentUser.postCount;
+
+    //TODO : cache this update
     await User.updateOne(
       { firebaseUid: req.body.userFirebaseId },
       { postCount: currentPostCount + 1 }
@@ -82,6 +84,7 @@ const deletePost = async (req, res) => {
   res.status(StatusCodes.NO_CONTENT).json();
 };
 
+//TODO : update user schema and sync this api with the user profile
 const likePost = async (req, res) => {
   console.log("entered like PostController");
   const { id: postId } = req.params;
@@ -89,6 +92,7 @@ const likePost = async (req, res) => {
   await Blogpost.findByIdAndUpdate(postId, { likes: requiredPost.likes + 1 });
 };
 
+//TODO : update user schema and sync this api with the user profile
 const unlikePost = async (req, res) => {
   console.log("entered unlike post controller");
   const { id: postId } = req.params;
