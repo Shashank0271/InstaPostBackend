@@ -8,6 +8,7 @@ const express = require("express");
 const app = express();
 const { connectDB } = require("./db/connect");
 const { errorHandlerMiddleware } = require("./middleware/error-handler");
+const rateLimit = require("express-rate-limit");
 const posts = require("./routes/posts");
 const users = require("./routes/users");
 
@@ -28,6 +29,13 @@ const port = process.env.PORT || 4000;
 app.use(
   fileUpload({
     useTempFiles: true,
+  })
+);
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests within above time interval
+    message: "Too many requests, please try again later",
   })
 );
 app.use(express.json());
