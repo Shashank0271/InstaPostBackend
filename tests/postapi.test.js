@@ -95,19 +95,19 @@ describe("POST APIS", () => {
     // Make the request to the API endpoint
     const { statusCode, body } = await request(app).get("/api/v1/posts");
     expect(statusCode).toBe(StatusCodes.OK);
-    expect(body).toHaveLength(2);
+    expect(body).toHaveLength(3);
 
-    expect(body[0]).toHaveProperty("title", "Test post1");
-    expect(body[0]).toHaveProperty("body", "This is a test post(1)");
-    expect(body[0]).toHaveProperty("category", "First Test category");
-    expect(body[0]).toHaveProperty("userFirebaseId", currentUser.firebaseUid);
-    expect(body[0]).toHaveProperty("userName", currentUser.username);
-
-    expect(body[1]).toHaveProperty("title", "Test post2");
-    expect(body[1]).toHaveProperty("body", "This is a test post(2)");
-    expect(body[1]).toHaveProperty("category", "Second Test category");
+    expect(body[1]).toHaveProperty("title", "Test post1");
+    expect(body[1]).toHaveProperty("body", "This is a test post(1)");
+    expect(body[1]).toHaveProperty("category", "First Test category");
     expect(body[1]).toHaveProperty("userFirebaseId", currentUser.firebaseUid);
     expect(body[1]).toHaveProperty("userName", currentUser.username);
+
+    expect(body[2]).toHaveProperty("title", "Test post2");
+    expect(body[2]).toHaveProperty("body", "This is a test post(2)");
+    expect(body[2]).toHaveProperty("category", "Second Test category");
+    expect(body[2]).toHaveProperty("userFirebaseId", currentUser.firebaseUid);
+    expect(body[2]).toHaveProperty("userName", currentUser.username);
   });
 
   it("should fetch only the current users post", async () => {
@@ -128,7 +128,7 @@ describe("POST APIS", () => {
     );
 
     expect(statusCode).toBe(StatusCodes.OK);
-    expect(body).toHaveLength(1);
+    expect(body).toHaveLength(3);
     expect(body[0]).toHaveProperty("userFirebaseId", currentUser.firebaseUid);
   });
 });

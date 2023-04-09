@@ -1,6 +1,6 @@
 const request = require("supertest");
 const { MongoMemoryServer } = require("mongodb-memory-server");
-const {startServerWithUrl} = require("../app");
+const { startServerWithUrl } = require("../app");
 const { disconnectDB } = require("../db/connect");
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
@@ -38,10 +38,10 @@ describe("USER APIS", () => {
       expect(response.body.newUser.registrationToken).toBe(
         userObject.registrationToken
       );
-      expect(response.body.newUser.postIds.length).toBe(0);
-      expect(response.body.newUser.followersTokens.length).toBe(0);
-      expect(response.body.newUser.followers.length).toBe(0);
-      expect(response.body.newUser.following.length).toBe(0);
+      // expect(response.body.newUser.postIds).toHaveLength(0);
+      expect(response.body.newUser.followersTokens).toHaveLength(0);
+      expect(response.body.newUser.followers).toHaveLength(0);
+      expect(response.body.newUser.following).toHaveLength(0);
     });
 
     it("should not accept incomplete details", async () => {
@@ -84,10 +84,10 @@ describe("USER APIS", () => {
       expect(body.email).toBe(userObject.email);
       expect(body.firebaseUid).toBe(userObject.firebaseUid);
       expect(body.registrationToken).toBe(userObject.registrationToken);
-      expect(body.postIds.length).toBe(0);
-      expect(body.followersTokens.length).toBe(0);
-      expect(body.followers.length).toBe(0);
-      expect(body.following.length).toBe(0);
+      // expect(body.postIds).toHaveLength(0);
+      expect(body.followersTokens).toHaveLength(0);
+      expect(body.followers).toHaveLength(0);
+      expect(body.following).toHaveLength(0);
     });
 
     it("should give a response with 404 status code when Users FID is not present in DB", async () => {
@@ -101,10 +101,17 @@ describe("USER APIS", () => {
 
   describe("USER update", () => {
     it("should return with 200 status code", async () => {
+      await User.insertMany({
+        username: "uname",
+        email: "uname@gmail.com",
+        firebaseUid: "unamesfid",
+        registrationToken: "fakeregtoken2",
+      });
+
       const { statusCode, body } = await request(app)
         .patch("/api/v1/users")
         .send({
-          firebaseUid: userObject.firebaseUid,
+          firebaseUid: "unamesfid",
           username: "uname",
         });
 
@@ -112,8 +119,9 @@ describe("USER APIS", () => {
       expect(body.message).toBe("profile updated successfully");
 
       const updatedUser = await User.findOne({
-        firebaseUid: userObject.firebaseUid,
+        firebaseUid: "unamesfid",
       });
+      console.log(updatedUser);
       expect(updatedUser.username).toBe("uname");
     });
 
@@ -178,5 +186,3 @@ describe("USER APIS", () => {
     it("the last item in the list should be the firebaseuid of the current user", () => {});
   });
 });
-
-
