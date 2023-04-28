@@ -20,7 +20,6 @@ TODO : FEATURES TO ADD :
 2)secure apis using firebase user token (middleware)
 6)add comments section to the application
 (make sep collection for comments and use postid to identify comments for a certain post)
-4)create docker file for project
 5)try to deploy on kubernetes
 */
 
@@ -55,18 +54,18 @@ module.exports.startServerWithUrl = (databaseUrl) => {
   const start = async () => {
     try {
       await connectDB(databaseUrl);
-      if (cluster.isMaster) {
-        for (let i = 0; i < numCpus; i++) {
-          cluster.fork();
-        }
-      } else {
+      // if (cluster.isMaster) {
+      //   for (let i = 0; i < numCpus; i++) {
+      //     cluster.fork();
+      //   }
+      // } else {
         app.listen(
           port,
           console.log(
             `The server PID=${process.pid} is listening on port ${port}...`
           )
         );
-      }
+      // }
     } catch (error) {
       console.log(error.toString());
     }
