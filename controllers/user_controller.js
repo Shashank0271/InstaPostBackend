@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const { CustomAPIError } = require("../errors/custom-error");
 const User = require("../models/User");
-const redisClient = require("../redis/connect");
+const {redisClient} = require("../redis/connect");
 
 const createUser = async (req, res) => {
   console.log("entered create user controller");
@@ -40,7 +40,7 @@ const updateUser = async (req, res) => {
       .status(StatusCodes.BAD_REQUEST)
       .json({ message: "username needs to be provided" });
   }
-  
+
   const updatedUser = await User.findOneAndUpdate(
     { firebaseUid: firebaseUid },
     { username: username }
