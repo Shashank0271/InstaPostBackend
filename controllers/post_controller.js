@@ -52,6 +52,7 @@ const createPost = async (req, res) => {
 };
 
 const getAllPosts = async (_, res) => {
+  console.log("fetching all posts");
   result = await Blogpost.find();
   res.status(StatusCodes.OK).json(result);
 };
@@ -94,6 +95,7 @@ const unlikePost = async (req, res) => {
   const { id: postId } = req.params;
   const requiredPost = await Blogpost.findById(postId);
   await Blogpost.findByIdAndUpdate(postId, { likes: requiredPost.likes - 1 });
+  res.status(StatusCodes.OK);
 };
 
 const updatePost = async (req, res) => {
