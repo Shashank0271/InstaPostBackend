@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const { CustomAPIError } = require("../errors/custom-error");
 const User = require("../models/User");
-const redisClient = require("../redis/connect");
+const {redisClient} = require("../redis/connect");
 
 const createUser = async (req, res) => {
   console.log("entered create user controller");
@@ -14,7 +14,6 @@ const createUser = async (req, res) => {
 const getUser = async (req, res) => {
   console.log("entered get user controller");
   const firebaseUid = req.params.id;
-
   const cachedUser = await redisClient.get(firebaseUid);
 
   if (cachedUser) {
@@ -40,7 +39,7 @@ const updateUser = async (req, res) => {
       .status(StatusCodes.BAD_REQUEST)
       .json({ message: "username needs to be provided" });
   }
-  
+
   const updatedUser = await User.findOneAndUpdate(
     { firebaseUid: firebaseUid },
     { username: username }
@@ -69,10 +68,8 @@ const followUser = async (req, res) => {
       followersTokens: followedUser.followersTokens,
     }
   );
-
   redisClient.set(currentUserFid, JSON.stringify(currentUserUpdated));
   redisClient.set(followedUserFid, JSON.stringify(followedUserUpdated));
-
   return res
     .status(StatusCodes.OK)
     .json({ message: "user followed successfully" });

@@ -15,4 +15,5 @@ async function connect() {
 }
 
 connect();
-module.exports = client;
+
+module.exports.redisClient = client;

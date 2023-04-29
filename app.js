@@ -14,11 +14,9 @@ const users = require("./routes/users");
 
 /*
 TODO : FEATURES TO ADD : 
-1)implement redis to cache user profile
 2)secure apis using firebase user token (middleware)
 3)add comments section to the application
 (make sep collection for comments and use postid to identify comments for a certain post)
-4)create docker file for project
 5)try to deploy on kubernetes
 */
 
