@@ -5,6 +5,7 @@ const { uploadImage } = require("../modules/cloudinaryApis/createImage");
 const Blogpost = require("../models/Posts");
 const User = require("../models/User");
 const { admin } = require("../modules/fcm/fcm");
+const { redisClient } = require("../redis/connect");
 
 const createPost = async (req, res) => {
   console.log("entered create post controller");
@@ -84,20 +85,60 @@ const deletePost = async (req, res) => {
   res.status(StatusCodes.NO_CONTENT).json();
 };
 
-//TODO : update user schema and sync this api with the user profile
 const likePost = async (req, res) => {
   console.log("entered like PostController");
-  const { id: postId } = req.params;
+  const { id: postId, fid: firebaseUid } = req.params;
   const requiredPost = await Blogpost.findById(postId);
+  let currentUser;
+  const cachedUser = await redisClient.get(firebaseUid);
+  if (cachedUser) {
+    currentUser = JSON.parse(cachedUser);
+  } else {
+    currentUser = await User.findOne({ firebaseUid: firebaseUid });
+  }
+
+  //updating the list of current users liked posts :
+  currentUser.likedPosts.push(postId);
+
+  //updating in redis
+  await redisClient.set(firebaseUid, JSON.stringify(currentUser));
+
+  //updating in database
+  await User.findOneAndUpdate(
+    { firebaseUid: firebaseUid },
+    {
+      likedPosts: currentUser.likedPosts,
+    }
+  );
   await Blogpost.findByIdAndUpdate(postId, { likes: requiredPost.likes + 1 });
+  res.status(StatusCodes.OK);
 };
 
-//TODO : update user schema and sync this api with the user profile
 const unlikePost = async (req, res) => {
   console.log("entered unlike post controller");
-  const { id: postId } = req.params;
+  const { id: postId, fid: firebaseUid } = req.params;
+
   const requiredPost = await Blogpost.findById(postId);
+  // const currentUser = await User.findOne({ firebaseUid: firebaseUid });
+  const cachedUser = await redisClient.get(firebaseUid);
+  const currentUser = JSON.parse(cachedUser);
+
+  //removing from likedPosts list of current user :
+  const likedPostsList = currentUser.likedPosts;
+  const index = likedPostsList.indexOf(postId);
+  likedPostsList.splice(index, 1);
+  currentUser.likedPosts = likedPostsList;
+
+  //updating current user in redis :
+  redisClient.set(firebaseUid, JSON.stringify(currentUser));
+
+  //updating current user in database :
+  await User.findOneAndUpdate(
+    { firebaseUid: firebaseUid },
+    { likedPosts: likedPostsList }
+  );
   await Blogpost.findByIdAndUpdate(postId, { likes: requiredPost.likes - 1 });
+  res.status(StatusCodes.OK);
 };
 
 const updatePost = async (req, res) => {

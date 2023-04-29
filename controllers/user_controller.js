@@ -14,7 +14,6 @@ const createUser = async (req, res) => {
 const getUser = async (req, res) => {
   console.log("entered get user controller");
   const firebaseUid = req.params.id;
-
   const cachedUser = await redisClient.get(firebaseUid);
 
   if (cachedUser) {

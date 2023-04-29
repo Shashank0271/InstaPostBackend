@@ -1,7 +1,6 @@
 require("express-async-errors");
 require("dotenv").config();
 require("./modules/fcm/fcm").initFcm();
-require("./redis/connect");
 const fileUpload = require("express-fileupload");
 const { setupCloudConfig } = require("./modules/cloudinaryApis/connect");
 const express = require("express");

@@ -131,4 +131,7 @@ describe("POST APIS", () => {
     expect(body).toHaveLength(3);
     expect(body[0]).toHaveProperty("userFirebaseId", currentUser.firebaseUid);
   });
+
+  // it("should add the post id of the liked post to ")
+
 });
