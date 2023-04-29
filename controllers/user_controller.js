@@ -69,10 +69,8 @@ const followUser = async (req, res) => {
       followersTokens: followedUser.followersTokens,
     }
   );
-
   redisClient.set(currentUserFid, JSON.stringify(currentUserUpdated));
   redisClient.set(followedUserFid, JSON.stringify(followedUserUpdated));
-
   return res
     .status(StatusCodes.OK)
     .json({ message: "user followed successfully" });

@@ -6,5 +6,5 @@ async function connect() {
 }
 
 connect();
-// module.exports.redisClient = client;
+
 module.exports = connect;
