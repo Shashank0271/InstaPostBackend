@@ -4,6 +4,7 @@ const { startServerWithUrl } = require("../app");
 const { disconnectDB } = require("../db/connect");
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
+const { createHttpServer, tearDownHttpServer } = require("../httpserver");
 
 const userObject = {
   username: "testusername",
@@ -23,6 +24,14 @@ describe("USER APIS", () => {
   afterAll(async () => {
     await disconnectDB();
   });
+
+  beforeEach( async() =>{
+    createHttpServer(app) ;
+  });
+
+  afterEach( async()=>{
+    tearDownHttpServer();
+  })
 
   describe("USER POST/---- ", () => {
     it("should responde with a 200 status code , respond with a new user", async () => {

@@ -10,7 +10,7 @@ const { errorHandlerMiddleware } = require("./middleware/error-handler");
 const rateLimit = require("express-rate-limit");
 const posts = require("./routes/posts");
 const users = require("./routes/users");
-
+const { createHttpServer } = require("./httpserver");
 const os = require("os");
 const cluster = require("cluster");
 
@@ -47,7 +47,7 @@ app.use("/api/v1/users", users);
 app.use(errorHandlerMiddleware); //cloudinary
 
 setupCloudConfig();
-
+let server;
 module.exports.startServerWithUrl = (databaseUrl) => {
   //database
   const start = async () => {
@@ -58,12 +58,17 @@ module.exports.startServerWithUrl = (databaseUrl) => {
       //     cluster.fork();
       //   }
       // } else {
-        app.listen(
-          port,
-          console.log(
-            `The server PID=${process.pid} is listening on port ${port}...`
-          )
-        );
+
+      //------UNCOMMENT
+      // server = app.listen(
+      //   port,
+      //   console.log(
+      //     `The server PID=${process.pid} is listening on port ${port}...`
+      //   )
+      // );
+      //------UNCOMMENT
+      // createHttpServer(app);
+      
       // }
     } catch (error) {
       console.log(error.toString());
@@ -73,3 +78,5 @@ module.exports.startServerWithUrl = (databaseUrl) => {
   start();
   return app;
 };
+
+module.exports.server = server;

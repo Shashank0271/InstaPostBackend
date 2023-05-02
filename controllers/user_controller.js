@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const { CustomAPIError } = require("../errors/custom-error");
 const User = require("../models/User");
-const {redisClient} = require("../redis/connect");
+const { redisClient } = require("../modules/redis/connect");
 
 const createUser = async (req, res) => {
   console.log("entered create user controller");
@@ -51,9 +51,9 @@ const updateUser = async (req, res) => {
 const followUser = async (req, res) => {
   console.log("enter follow user controller");
   const { currentUserFid, followedUserFid, currentUserToken } = req.body;
-  console.log(currentUserToken);
   const currentUser = await User.findOne({ firebaseUid: currentUserFid });
   const followedUser = await User.findOne({ firebaseUid: followedUserFid });
+  
   currentUser.following.push(followedUserFid);
   followedUser.followers.push(currentUserFid);
   followedUser.followersTokens.push(currentUserToken);

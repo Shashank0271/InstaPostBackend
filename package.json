@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "npx jest --forceExit",
+    "test": "npx jest --coverage --forceExit --maxWorkers=1",
     "start": "nodemon server.js"
   },
   "author": "Shashank",

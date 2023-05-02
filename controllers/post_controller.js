@@ -5,7 +5,7 @@ const { uploadImage } = require("../modules/cloudinaryApis/createImage");
 const Blogpost = require("../models/Posts");
 const User = require("../models/User");
 const { admin } = require("../modules/fcm/fcm");
-const { redisClient } = require("../redis/connect");
+const { redisClient } = require("../modules/redis/connect");
 
 const createPost = async (req, res) => {
   console.log("entered create post controller");
@@ -23,7 +23,8 @@ const createPost = async (req, res) => {
       { firebaseUid: req.body.userFirebaseId },
       { postCount: currentPostCount + 1 }
     );
-    if (currentUser.followersTokens.length > 0)
+    if (currentUser.followersTokens.length > 0) {
+      console.log("SENDING FCM------------");
       await admin
         .messaging()
         .sendMulticast({
@@ -46,6 +47,8 @@ const createPost = async (req, res) => {
           console.log(response.successCount);
           console.log("messages sent!");
         });
+    }
+
     res.status(StatusCodes.CREATED).json(post);
   } catch (error) {
     console.error(error.toString());
