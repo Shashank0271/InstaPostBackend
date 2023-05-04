@@ -24,11 +24,15 @@ TODO : FEATURES TO ADD :
 const port = process.env.PORT || 4000;
 
 //middleware
+
+app.set("trust proxy", true);
+
 app.use(
   fileUpload({
     useTempFiles: true,
   })
 );
+
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -36,6 +40,12 @@ app.use(
     message: "Too many requests, please try again later",
   })
 );
+
+app.get("/", function (req, res) {
+  console.log("this is a log message");
+  res.send("success");
+});
+
 app.use(express.json());
 app.use("/api/v1/posts", posts);
 app.use("/api/v1/users", users);
