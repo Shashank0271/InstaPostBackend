@@ -3,6 +3,7 @@ const { MongoMemoryServer } = require("mongodb-memory-server");
 const { startServerWithUrl } = require("../app");
 const { disconnectDB } = require("../db/connect");
 const { deleteImage } = require("../modules/cloudinaryApis/deleteFile");
+const { createHttpServer, tearDownHttpServer } = require("../httpserver");
 const User = require("../models/User");
 const Post = require("../models/Posts");
 const { StatusCodes } = require("http-status-codes");
@@ -32,17 +33,37 @@ describe("POST APIS", () => {
 
   beforeEach(async () => {
     // Set up a test user
+    createHttpServer(app);
     currentUser = await User.create(userObject);
   });
 
   afterEach(async () => {
+    tearDownHttpServer();
     await User.deleteMany({});
     // await Post.deleteMany({});
   });
 
   it("creates a new blog post", async () => {
     // Set up the request body with a file
+
+    //make a new user and make him to follow this user
+    const followerObject = {
+      username: "followerusername",
+      email: "followeremail@gmail.com",
+      firebaseUid: "followerfirebasetestuid",
+      registrationToken: "followerfakeregtoken",
+    };
+
+    //insert into the database
+    await User.create(followerObject);
+    await request(app).post("/api/v1/users/follow").send({
+      currentUserFid: followerObject.firebaseUid,
+      followedUserFid: userObject.firebaseUid,
+      currentUserToken: followerObject.registrationToken,
+    });
+
     const file = fs.readFileSync(path.join(__dirname, "house.png"));
+
     const reqBody = {
       title: "Test post",
       body: "This is a test post",
@@ -114,10 +135,10 @@ describe("POST APIS", () => {
     //inserting posts into the database
     await Post.insertMany([
       {
-        title: "Test post2",
-        body: "This is a test post(2)",
-        category: "Second Test category",
-        userFirebaseId: "someOTherFID",
+        title: "Test post3",
+        body: "This is a test post(3)",
+        category: "Second Test category3",
+        userFirebaseId: "someOTherFID45",
         userName: currentUser.username,
       },
     ]);
@@ -132,6 +153,13 @@ describe("POST APIS", () => {
     expect(body[0]).toHaveProperty("userFirebaseId", currentUser.firebaseUid);
   });
 
+  it("should fetch the post specified by the postId", async () => {
+    const testPost = await Post.findOne({ title: "Test post" });
+    const { statusCode, body } = await request(app).get(
+      `/api/v1/posts/fetchpost/${testPost["_id"].toString()}`
+    );
+    expect(statusCode).toBe(StatusCodes.OK);
+    expect(body["_id"].toString()).toBe(testPost["_id"].toString());
+  });
   // it("should add the post id of the liked post to ")
-
 });

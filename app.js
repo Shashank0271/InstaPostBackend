@@ -11,6 +11,9 @@ const { errorHandlerMiddleware } = require("./middleware/error-handler");
 const rateLimit = require("express-rate-limit");
 const posts = require("./routes/posts");
 const users = require("./routes/users");
+const { createHttpServer } = require("./httpserver");
+const os = require("os");
+const cluster = require("cluster");
 
 /*
 TODO : FEATURES TO ADD : 
@@ -51,16 +54,29 @@ app.use("/api/v1/posts", posts);
 app.use("/api/v1/users", users);
 app.use(errorHandlerMiddleware); //cloudinary
 setupCloudConfig();
-
+let server;
 module.exports.startServerWithUrl = (databaseUrl) => {
   //database
   const start = async () => {
     try {
       await connectDB(databaseUrl);
-      app.listen(
-        port,
-        console.log(`The server is listening on port ${port}...`)
-      );
+      // if (cluster.isMaster) {
+      //   for (let i = 0; i < numCpus; i++) {
+      //     cluster.fork();
+      //   }
+      // } else {
+
+      //------UNCOMMENT
+      // server = app.listen(
+      //   port,
+      //   console.log(
+      //     `The server PID=${process.pid} is listening on port ${port}...`
+      //   )
+      // );
+      //------UNCOMMENT
+      // createHttpServer(app);
+      
+      // }
     } catch (error) {
       console.log(error);
     }
@@ -69,3 +85,5 @@ module.exports.startServerWithUrl = (databaseUrl) => {
   start();
   return app;
 };
+
+module.exports.server = server;
