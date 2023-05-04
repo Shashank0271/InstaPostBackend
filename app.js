@@ -1,7 +1,6 @@
 require("express-async-errors");
 require("dotenv").config();
 require("./modules/fcm/fcm").initFcm();
-require("./redis/connect");
 const fileUpload = require("express-fileupload");
 const { setupCloudConfig } = require("./modules/cloudinaryApis/connect");
 const express = require("express");
@@ -11,7 +10,6 @@ const { errorHandlerMiddleware } = require("./middleware/error-handler");
 const rateLimit = require("express-rate-limit");
 const posts = require("./routes/posts");
 const users = require("./routes/users");
-const { createHttpServer } = require("./httpserver");
 const os = require("os");
 const cluster = require("cluster");
 
@@ -75,7 +73,7 @@ module.exports.startServerWithUrl = (databaseUrl) => {
       // );
       //------UNCOMMENT
       // createHttpServer(app);
-      
+
       // }
     } catch (error) {
       console.log(error);
