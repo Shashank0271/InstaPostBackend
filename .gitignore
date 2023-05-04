@@ -2,3 +2,4 @@ node_modules/
 .env
 tmp/
 insta-post-20842-firebase-adminsdk-l90k9-b0a2d695d6.json
+coverage/
