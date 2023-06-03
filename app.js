@@ -10,9 +10,7 @@ const { errorHandlerMiddleware } = require("./middleware/error-handler");
 const rateLimit = require("express-rate-limit");
 const posts = require("./routes/posts");
 const users = require("./routes/users");
-const { createHttpServer } = require("./httpserver");
 const os = require("os");
-const cluster = require("cluster");
 
 /*
 TODO : FEATURES TO ADD : 
@@ -41,13 +39,13 @@ app.use(
     message: "Too many requests, please try again later",
   })
 );
+
 app.use(express.json());
 app.use("/api/v1/posts", posts);
 app.use("/api/v1/users", users);
 app.use(errorHandlerMiddleware); //cloudinary
 
 setupCloudConfig();
-let server;
 module.exports.startServerWithUrl = (databaseUrl) => {
   //database
   const start = async () => {
@@ -67,7 +65,6 @@ module.exports.startServerWithUrl = (databaseUrl) => {
       //   )
       // );
       //------UNCOMMENT
-      // createHttpServer(app);
       
       // }
     } catch (error) {
@@ -79,4 +76,3 @@ module.exports.startServerWithUrl = (databaseUrl) => {
   return app;
 };
 
-module.exports.server = server;

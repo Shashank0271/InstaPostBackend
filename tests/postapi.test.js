@@ -44,8 +44,6 @@ describe("POST APIS", () => {
   });
 
   it("creates a new blog post", async () => {
-    // Set up the request body with a file
-
     //make a new user and make him to follow this user
     const followerObject = {
       username: "followerusername",
@@ -54,7 +52,7 @@ describe("POST APIS", () => {
       registrationToken: "followerfakeregtoken",
     };
 
-    //insert into the database
+    //insert in db
     await User.create(followerObject);
     await request(app).post("/api/v1/users/follow").send({
       currentUserFid: followerObject.firebaseUid,
