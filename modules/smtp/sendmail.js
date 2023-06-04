@@ -1,11 +1,12 @@
 const transporter = require("./setupsmtp");
 
-async function sendEmail(supervisorMailId, requestId) {
+async function sendEmail(usersMailIds, subject, text) {
   const mailOptions = {
     from: process.env.ADMIN_EMAIL,
-    to: supervisorMailId,
-    subject: "Your request Id",
-    text: `You request has been sent successfully sent to the finace advisor .\n REQUEST ID : ${requestId} . Please save for future reference . \n Thank you. `,
+    to: usersMailIds,
+    subject: subject,
+    // text: "dont use this for new line",
+    html: text,
   };
 
   transporter.sendMail(mailOptions, function (error, info) {

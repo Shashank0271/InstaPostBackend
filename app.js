@@ -1,6 +1,7 @@
 require("express-async-errors");
 require("dotenv").config();
-require("./modules/fcm/fcm").initFcm();
+require("./modules/firebase/firebase_setup").initFirebase();
+require("./modules/jobs/email_job");
 const fileUpload = require("express-fileupload");
 const { setupCloudConfig } = require("./modules/cloudinaryApis/connect");
 const express = require("express");
@@ -32,6 +33,7 @@ app.use(
     useTempFiles: true,
   })
 );
+
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -65,7 +67,7 @@ module.exports.startServerWithUrl = (databaseUrl) => {
       //   )
       // );
       //------UNCOMMENT
-      
+
       // }
     } catch (error) {
       console.log(error.toString());
@@ -75,4 +77,3 @@ module.exports.startServerWithUrl = (databaseUrl) => {
   start();
   return app;
 };
-

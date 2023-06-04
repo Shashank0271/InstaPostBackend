@@ -4,7 +4,7 @@ const { deleteImage } = require("../modules/cloudinaryApis/deleteFile");
 const { uploadImage } = require("../modules/cloudinaryApis/createImage");
 const Blogpost = require("../models/Posts");
 const User = require("../models/User");
-const { admin } = require("../modules/fcm/fcm");
+const { admin } = require("../modules/firebase/firebase_setup");
 const { redisClient } = require("../modules/redis/connect");
 
 const createPost = async (req, res) => {
