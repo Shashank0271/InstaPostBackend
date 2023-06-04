@@ -14,8 +14,7 @@ const getPostLink = async function (postID) {
     `https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=${webApiKey}`,
     requestBody
   );
-  console.log(response);
-  console.log(response.data);
+  
   return response.data.shortLink;
 };
 

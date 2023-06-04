@@ -1,6 +1,7 @@
 const getPostLink = require("../firebase/deep_link");
 const cron = require("node-cron");
 const Post = require("../../models/Posts");
+const User = require("../../models/User");
 const sendMail = require("../smtp/sendmail");
 
 async function generateMailJob() {
@@ -11,6 +12,13 @@ async function generateMailJob() {
   const list = await Post.find({ createdOn: { $gte: oneWeekAgo } }, "title _id")
     .sort({ likes: -1 })
     .limit(5);
+    
+  const emails = await User.find({}, "email");
+  const emailList = [];
+  emails.forEach((element) => {
+    emailList.push(element["email"]);
+  });
+  const emailString = emailList.join(' ');
 
   const dynamicLinkList = [];
   for (const element of list) {
@@ -23,7 +31,7 @@ async function generateMailJob() {
   const postLinks = dynamicLinkList.join("<br>");
   emailBody = emailBody + postLinks;
 
-  await sendMail("ssingh0271@gmail.com", "Weekly digest", emailBody);
+  await sendMail(emailString, "Weekly digest", emailBody);
 }
 
 cron.schedule("*/10 * * * * *", generateMailJob);
